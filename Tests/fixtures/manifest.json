@@ -1,0 +1,628 @@
+{
+ "now": 1800000000,
+ "note": "now=2027-01-15T08:00:00Z. reset_in_min=resetsAt-now(분, ±1 허용). expect=견고한 파서가 내야 할 값, predicted=현재 Sources/main.swift를 읽고 한 예측(Mac 미검증). origin: documented-in-source=main.swift 주석에 나온 형식, synthetic=코드 동작을 찌르려고 만든 입력, hypothetical=실제 출력이 존재하는지 미확인",
+ "cases": [
+  {
+   "id": "claude-en-basic",
+   "kind": "claude",
+   "file": "claude/en-basic.txt",
+   "origin": "documented-in-source",
+   "predicted": "pass",
+   "why": "형식이 Claude.parse 주석과 동일",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-weekly-only",
+   "kind": "claude",
+   "file": "claude/en-weekly-only.txt",
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "주간 줄만 있어도 윈도우 1개로 파싱",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 10080,
+      "used": 12,
+      "reset_in_min": 3900
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-percent-0",
+   "kind": "claude",
+   "file": "claude/en-percent-0.txt",
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "0%는 [0-9.]+ 에 매치",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 0,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 0,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-percent-100",
+   "kind": "claude",
+   "file": "claude/en-percent-100.txt",
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "100, 100.0 모두 매치. 클램프는 Codex만(0…1000)",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 100,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 100,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-reset-passed",
+   "kind": "claude",
+   "file": "claude/en-reset-passed.txt",
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "리셋 시각이 24시간 이내 과거면 과거로 유지 → Window.didReset → 0%로 표시",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 100,
+      "reset_in_min": -480
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-no-reset-time",
+   "kind": "claude",
+   "file": "claude/en-no-reset-time.txt",
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "resets 그룹이 선택적이라 resetsAt=nil",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 7,
+      "reset_in_min": null
+     },
+     {
+      "minutes": 10080,
+      "used": 31,
+      "reset_in_min": null
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-extra-lines",
+   "kind": "claude",
+   "file": "claude/en-extra-lines.txt",
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "제목·빈 줄·들여쓰기·탭 무시, 'week (Opus)' 줄은 (all models)가 아니라 건너뜀",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-crlf",
+   "kind": "claude",
+   "file": "claude/en-crlf.txt",
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "String.split(separator: \"\\n\")은 \"\\r\\n\"을 한 Character로 취급해 분리 못 함 → 첫 줄만 매치, 주간 누락",
+   "traits": [
+    "crlf"
+   ],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-wrapped",
+   "kind": "claude",
+   "file": "claude/en-wrapped.txt",
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "'used'와 '· resets' 사이 줄바꿈 → 세션 윈도우는 잡히나 리셋 시각 유실(정규식이 한 줄 기준)",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-ansi",
+   "kind": "claude",
+   "file": "claude/en-ansi.txt",
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "ANSI 이스케이프가 줄 앞에 있으면 ^Current 불일치 → nil. NO_COLOR=1이 지켜진다는 전제에 의존",
+   "traits": [
+    "ansi"
+   ],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-uppercase-ampm",
+   "kind": "claude",
+   "file": "claude/en-uppercase-ampm.txt",
+   "origin": "hypothetical",
+   "predicted": "unknown",
+   "why": "DateFormatter가 'PM'/'AM'을 amSymbol 'am'과 대소문자 구분해 매치하는지 Mac에서 확인 필요(공백 'h:mm a'도 포맷 목록에 없음 → 실패 가능성 높음)",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-en-bar-style",
+   "kind": "claude",
+   "file": "claude/en-bar-style.txt",
+   "origin": "hypothetical",
+   "predicted": "fail",
+   "why": "Claude Code 문서가 /usage에 'plan usage bars'가 있다고 설명 → 막대가 끼면 '^Current …:\\s*N% used' 불일치",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "claude-ko-localized",
+   "kind": "claude",
+   "file": "claude/ko-localized.txt",
+   "origin": "hypothetical",
+   "predicted": "fail",
+   "why": "한국어 로캘 출력이 실제 존재하는지 미확인(가설). 존재한다면 ^Current … 영문 고정 정규식이라 전부 실패",
+   "traits": [],
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 4,
+      "reset_in_min": 210
+     },
+     {
+      "minutes": 10080,
+      "used": 49,
+      "reset_in_min": 6300
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-basic",
+   "kind": "codex",
+   "file": "codex/basic.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "최신 타임스탬프의 rate_limits 채택",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-no-rate-limits",
+   "kind": "codex",
+   "file": "codex/no-rate-limits.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "rate_limits가 null/빈 윈도우/없음 → nil",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": null
+  },
+  {
+   "id": "codex-extra-fields",
+   "kind": "codex",
+   "file": "codex/extra-fields.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "모르는 필드(tertiary, credits, plan_type…)는 무시",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-truncated-last-line",
+   "kind": "codex",
+   "file": "codex/truncated-last-line.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "잘린 마지막 줄은 JSON 파싱 실패로 건너뛰고 직전 줄 사용",
+   "traits": [
+    "truncated"
+   ],
+   "invalid_lines": 1,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-midline-start",
+   "kind": "codex",
+   "file": "codex/midline-start.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "tail()이 줄 중간에서 시작해도 첫 조각은 파싱 실패로 건너뜀",
+   "traits": [
+    "midline"
+   ],
+   "invalid_lines": 1,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-ts-no-fraction",
+   "kind": "codex",
+   "file": "codex/ts-no-fraction.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "ISO8601DateFormatter가 .withFractionalSeconds 필수 → 소수초 없는 타임스탬프는 distantPast → resets_in_seconds 기준이 0001년 → 'reset since then' 오표시",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-resets-at-millis",
+   "kind": "codex",
+   "file": "codex/resets-at-millis.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "resets_at 범위(0…4e9) 밖이면 resets_in_seconds로 폴백",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-string-numbers",
+   "kind": "codex",
+   "file": "codex/string-numbers.jsonl",
+   "generated": false,
+   "origin": "hypothetical",
+   "predicted": "fail",
+   "why": "used_percent/window_minutes가 문자열이면 as? NSNumber 실패 → 윈도우 드롭 → nil",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-nested-info",
+   "kind": "codex",
+   "file": "codex/nested-info.jsonl",
+   "generated": false,
+   "origin": "hypothetical",
+   "predicted": "fail",
+   "why": "rate_limits가 payload.info 아래로 이동하면 payload[\"rate_limits\"] 조회 실패 → nil",
+   "traits": [],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-crlf",
+   "kind": "codex",
+   "file": "codex/crlf.jsonl",
+   "generated": false,
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "CRLF면 split(separator:\"\\n\")이 안 갈라져 전체가 한 덩어리 → JSON 파싱 실패 → nil",
+   "traits": [
+    "crlf"
+   ],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-big-tail-hit",
+   "kind": "codex",
+   "file": "generated/big-tail-hit.jsonl",
+   "generated": true,
+   "origin": "synthetic",
+   "predicted": "pass",
+   "why": "파일은 256KiB 초과지만 rate_limits가 끝쪽 → tail()로 발견",
+   "traits": [
+    "big"
+   ],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-big-miss-small-lines",
+   "kind": "codex",
+   "file": "generated/big-miss-small-lines.jsonl",
+   "generated": true,
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "마지막 256KiB에 rate_limits가 없으면 이 파일은 nil → fetch()가 더 오래된 다른 파일의 값을 대신 보여줌(낡은 값)",
+   "traits": [
+    "big"
+   ],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  },
+  {
+   "id": "codex-big-miss-giant-line",
+   "kind": "codex",
+   "file": "generated/big-miss-giant-line.jsonl",
+   "generated": true,
+   "origin": "synthetic",
+   "predicted": "fail",
+   "why": "400KB 한 줄(도구 출력)이 끝을 채우면 같은 이유로 실패",
+   "traits": [
+    "big"
+   ],
+   "invalid_lines": 0,
+   "expect": {
+    "windows": [
+     {
+      "minutes": 300,
+      "used": 12.5,
+      "reset_in_min": 60
+     },
+     {
+      "minutes": 10080,
+      "used": 40,
+      "reset_in_min": 5760
+     }
+    ]
+   }
+  }
+ ]
+}

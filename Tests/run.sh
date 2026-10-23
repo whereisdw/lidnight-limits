@@ -1,9 +1,10 @@
 #!/bin/bash
-# Parser tests: compiles main.swift with a test entry and checks Claude /usage text and a Codex rate_limits line.
+# Parser tests: compiles main.swift with a test entry and checks Claude /usage text and a Codex rate_limits line,
+# then runs the fixture cases in Tests/fixtures (see docs/parser-cases.md). Needs a Mac (AppKit) and python3.
 set -e
 cd "$(dirname "$0")/.."
 T=$(mktemp -d)
-sed 's/^let app = NSApplication.shared$/runTests(); exit(0)\nlet app = NSApplication.shared/' Sources/main.swift > "$T/main.swift"
+sed 's/^let app = NSApplication.shared$/runTests(); runFixtureTests(); exit(0)\nlet app = NSApplication.shared/' Sources/main.swift > "$T/main.swift"
 cat >> "$T/main.swift" <<'SW'
 func runTests() {
     var fails = 0
@@ -25,5 +26,8 @@ func runTests() {
     if fails > 0 { exit(1) }
 }
 SW
+cat Tests/FixtureTests.swift >> "$T/main.swift"
+python3 Tests/fixtures/gen_big.py "$T/gen"
+export FIXTURES="$PWD/Tests/fixtures" FIXTURES_GEN="$T/gen"
 swiftc -O "$T/main.swift" -o "$T/t" && "$T/t"
 rm -rf "$T"

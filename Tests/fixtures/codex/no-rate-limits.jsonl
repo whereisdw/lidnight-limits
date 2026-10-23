@@ -1,0 +1,6 @@
+{"timestamp":"2027-01-15T07:00:00.000Z","type":"session_meta","payload":{"id":"abc","cwd":"/tmp/x"}}
+{"timestamp":"2027-01-15T07:01:00.000Z","type":"event_msg","payload":{"type":"agent_message","message":"hello"}}
+{"timestamp":"2027-01-15T07:10:00.000Z","type":"event_msg","payload":{"type":"token_count","info":null}}
+{"timestamp":"2027-01-15T07:11:00.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":100}},"rate_limits":null}}
+{"timestamp":"2027-01-15T07:12:00.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":100}},"rate_limits":{"primary":null,"secondary":null}}}
+{"timestamp":"2027-01-15T07:01:00.000Z","type":"event_msg","payload":{"type":"agent_message","message":"hello"}}

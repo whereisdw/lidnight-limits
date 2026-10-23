@@ -1,0 +1,33 @@
+name: fixtures
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  fixtures:
+    # Linux checks: fixture validity and VERSION/README consistency. Does not compile Swift (AppKit needs macOS).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fixtures are valid JSONL/text and match the manifest
+        run: bash Tests/check_fixtures.sh
+      - name: VERSION matches README install commands
+        run: bash Tests/check_version.sh
+
+  swift-macos:
+    # Informational only. The Swift sources import AppKit/ServiceManagement, so they only build on macOS, and the
+    # macos-latest runner image/Xcode can change under us. continue-on-error keeps a runner or toolchain hiccup
+    # (or the fixture cases that are *expected* to expose parser bugs) from blocking a PR; read the log instead.
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (no Package.swift in this repo, so swiftc as build.sh does)
+        run: swiftc -O -target arm64-apple-macos13 Sources/main.swift -o "$RUNNER_TEMP/LidnightLimits"
+      - name: Parser and fixture tests
+        run: ./Tests/run.sh

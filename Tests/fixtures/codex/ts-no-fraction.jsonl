@@ -1,0 +1,2 @@
+{"timestamp":"2027-01-15T07:00:00.000Z","type":"session_meta","payload":{"id":"abc","cwd":"/tmp/x"}}
+{"timestamp":"2027-01-15T07:59:00Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":100}},"rate_limits":{"primary":{"used_percent":12.5,"window_minutes":300,"resets_in_seconds":3660},"secondary":{"used_percent":40,"window_minutes":10080,"resets_in_seconds":345660}}}}

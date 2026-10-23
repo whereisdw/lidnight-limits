@@ -1,0 +1,2 @@
+ens":{"total_tokens":42}},"rate_limits":{"primary":{"used_percent":99,"window_minutes":300}}}
+{"timestamp":"2027-01-15T07:58:00.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":100}},"rate_limits":{"primary":{"used_percent":12.5,"window_minutes":300,"resets_at":1800003600},"secondary":{"used_percent":40,"window_minutes":10080,"resets_at":1800345600}}}}

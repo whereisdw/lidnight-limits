@@ -1,7 +1,7 @@
 # 파서 케이스 표
 
 `Sources/main.swift`의 `Claude.parse` / `Codex.parse` / `Codex.tail` / `Codex.fetch`를 **코드 독해만으로** 분석한 결과다.
-이 표의 "예측"은 Mac에서 아직 실행하지 않았다(작성 환경이 Linux). `Tests/run.sh`가 `Tests/fixtures/manifest.json`의 같은 케이스를 돌려
+이 표의 "예측"은 코드 독해로 작성했다(작성 환경이 Linux). 이후 PR의 macOS CI 잡이 `Tests/run.sh`를 실행해 예측 `실패` 13건이 모두 XFAIL로 나오고 예측 밖 FAIL이 없음을 확인했다(`불확실` 1건은 통과). 로컬 Mac 실행은 아직 없다. `Tests/run.sh`가 `Tests/fixtures/manifest.json`의 같은 케이스를 돌려
 `PASS` / `XFAIL`(예측된 실패) / `FAIL`(예측 밖 불일치, 종료 1) / `XPASS`·`INFO`(예측이 틀렸거나 불확실)로 보여 준다.
 
 - `origin`: `documented-in-source` = main.swift 주석에 나온 형식 / `synthetic` = 코드 동작을 찌르려고 만든 입력 / `hypothetical` = 실제 출력이 존재하는지 **미확인**.
@@ -25,7 +25,7 @@
 | `claude-en-crlf` | CRLF 줄바꿈 | **실패** | Swift에서 `"\r\n"`은 한 `Character`라 `split(separator: "\n")`이 안 갈라짐 → 첫 줄만 `^`에 매치, 주간 누락(과소 표시) |
 | `claude-en-wrapped` | `used`와 `· resets` 사이 줄바꿈 | **실패** | 줄 단위 정규식 → 윈도우는 잡히나 리셋 시각 유실 |
 | `claude-en-ansi` | ANSI 색 이스케이프 | **실패** | `^Current` 앞에 `ESC[1m`이 붙어 불일치 → nil. 50행 `NO_COLOR=1`이 항상 지켜진다는 가정에 의존 |
-| `claude-en-uppercase-ampm` | `8:30 PM`, `2 AM` | **불확실** | 84행 `amSymbol="am"`; 대소문자·공백(`h:mm a`) 처리를 포맷 목록(86행)이 안 다룸. Mac에서 확인 |
+| `claude-en-uppercase-ampm` | `8:30 PM`, `2 AM` | 통과 | 불확실로 예측했으나 CI macOS 러너에서 통과 확인(2026-10-23, 이 PR의 `swift-macos` 잡). `DateFormatter`가 대소문자·공백을 허용 |
 | `claude-en-bar-style` | 막대가 낀 줄 | **실패** | Claude Code 문서는 `/usage`에 "plan usage bars"가 있다고 설명. `Current session:` 뒤에 막대가 오면 불일치. 실제 `-p` 출력 형식 미확인 |
 | `claude-ko-localized` | 한국어 로캘 | **실패** | 영문 고정 정규식. 한국어 출력이 실제로 존재하는지부터 미확인 |
 

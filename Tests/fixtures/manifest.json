@@ -236,8 +236,8 @@
    "kind": "claude",
    "file": "claude/en-uppercase-ampm.txt",
    "origin": "hypothetical",
-   "predicted": "unknown",
-   "why": "DateFormatter가 'PM'/'AM'을 amSymbol 'am'과 대소문자 구분해 매치하는지 Mac에서 확인 필요(공백 'h:mm a'도 포맷 목록에 없음 → 실패 가능성 높음)",
+   "predicted": "pass",
+   "why": "처음엔 불확실로 예측했으나 macOS 러너(CI)에서 통과 확인: DateFormatter가 'PM'/'AM'과 'h:mm a' 공백 형식을 받아들임",
    "traits": [],
    "expect": {
     "windows": [
